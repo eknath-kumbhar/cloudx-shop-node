@@ -1,0 +1,24 @@
+{
+  "name": "cloudx-shop-node",
+  "version": "1.0.0",
+  "description": "This repo contains code for backend services for shop app",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eknath-kumbhar/cloudx-shop-node.git"
+  },
+  "keywords": [
+    "CloudX",
+    "AWS",
+    "Lambda"
+  ],
+  "author": "Eknath Kumbhar",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/eknath-kumbhar/cloudx-shop-node/issues"
+  },
+  "homepage": "https://github.com/eknath-kumbhar/cloudx-shop-node#readme"
+}
