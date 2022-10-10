@@ -1,12 +1,10 @@
-import type { ValidatedEventAPIGatewayProxyEvent } from '@libs/api-gateway';
 import { formatJSONResponse } from '@libs/api-gateway';
 import { middyfy } from '@libs/lambda';
 import { NO_PRDUCT_FOUND } from 'src/errors';
 import { ProductService } from 'src/product.service';
 
-import schema from './schema';
 
-const getProductsById: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (event) => {
+const getProductsById = async (event) => {
   let statusCode = 200;
   try {
     const productService = new ProductService();
