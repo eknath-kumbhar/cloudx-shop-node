@@ -1,5 +1,5 @@
 import { NoProductFound } from "./errors";
-import { Product } from "./product.model";
+import { Product } from "./types/product";
 import { ProductsData } from "./products.mock";
 
 export class ProductService {

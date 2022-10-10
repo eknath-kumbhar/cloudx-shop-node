@@ -7,7 +7,16 @@ export default {
       http: {
         method: 'get',
         path: 'products/{productId}',
-        cors: true
+        cors: true,
+        responses: {
+          200: {
+            description: 'This is a success response',
+            bodyType: 'Product'
+          },
+          404: {
+            description: 'This is a Error response'
+          }
+        }
       },
     },
   ],

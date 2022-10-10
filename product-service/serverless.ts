@@ -5,7 +5,7 @@ import { getProductsList, getProductsById } from '@functions/index';
 const serverlessConfiguration: AWS = {
   service: 'product-service',
   frameworkVersion: '3',
-  plugins: ['serverless-esbuild', 'serverless-openapi-documentation', 'serverless-offline'],
+  plugins: ['serverless-auto-swagger', 'serverless-esbuild', 'serverless-offline'],
   provider: {
     name: 'aws',
     runtime: 'nodejs14.x',
@@ -23,6 +23,9 @@ const serverlessConfiguration: AWS = {
   functions: { getProductsList, getProductsById },
   package: { individually: true },
   custom: {
+    autoswagger: {
+      typefiles: ['./src/types/product.d.ts']
+    },
     esbuild: {
       bundle: true,
       minify: false,
