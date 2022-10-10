@@ -3,8 +3,7 @@ import { middyfy } from '@libs/lambda';
 import { NO_PRDUCT_FOUND } from 'src/errors';
 import { ProductService } from 'src/product.service';
 
-
-const getProductsById = async (event) => {
+export const getProductsById = async (event) => {
   let statusCode = 200;
   try {
     const productService = new ProductService();
