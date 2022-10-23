@@ -10,3 +10,6 @@ jspm_packages
 
 # swagger directories
 swagger
+
+# environmment files
+.env
