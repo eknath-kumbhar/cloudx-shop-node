@@ -7,7 +7,7 @@ export const getProductsList = async () => {
     const productService = new ProductService();
     return formatJSONResponse(await productService.getProducts(), 200);
   } catch (error) {
-    return formatJSONResponse({ message: 'error' }, 500);
+    return formatJSONResponse({ message: error.message || 'error' }, 500);
   }
 };
 

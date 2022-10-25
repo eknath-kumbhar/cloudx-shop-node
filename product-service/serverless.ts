@@ -5,7 +5,7 @@ import { getProductsList, getProductsById } from '@functions/index';
 const serverlessConfiguration: AWS = {
   service: 'product-service',
   frameworkVersion: '3',
-  plugins: ['serverless-auto-swagger', 'serverless-esbuild', 'serverless-offline'],
+  plugins: ['serverless-dotenv-plugin', 'serverless-auto-swagger', 'serverless-esbuild', 'serverless-offline'],
   useDotenv: true,
   provider: {
     name: 'aws',
@@ -19,6 +19,18 @@ const serverlessConfiguration: AWS = {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
     },
+    iamRoleStatements: [
+      {
+        Effect: "Allow",
+        Action: [
+          "dynamodb:Scan",
+          "dynamodb:GetItem"
+        ],
+        Resource: [
+          "arn:aws:dynamodb:ap-south-1:059012808184:table/products",
+          "arn:aws:dynamodb:ap-south-1:059012808184:table/stocks"]
+      }
+    ]
   },
   // import the function via paths
   functions: { getProductsList, getProductsById },

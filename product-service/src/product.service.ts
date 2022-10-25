@@ -1,29 +1,66 @@
 import { NoProductFound } from "./errors";
 import { Product } from "./types/product";
-import { ProductsData } from "./products.mock";
+import AWS from 'aws-sdk';
 
 export class ProductService {
-    constructor() {
+    DB_REGION: string;
+    PRODUCT_TABLE_NAME: string;
+    STOCK_TABLE_NAME: string
+    dynamoDbDocumentClient: any;
 
+    constructor() {
+        ({ DB_REGION: this.DB_REGION, PRODUCT_TABLE_NAME: this.PRODUCT_TABLE_NAME, STOCK_TABLE_NAME: this.STOCK_TABLE_NAME } = process.env);
+        AWS.config.update({ region: this.DB_REGION });
+        this.dynamoDbDocumentClient = new AWS.DynamoDB.DocumentClient();
     }
 
     async getProducts(): Promise<Array<Product>> {
-        return Promise.resolve(ProductsData);
+        return new Promise(async (resolve, reject) => {
+            try {
+                const productsTableData: any = await this.getTableDataBy(this.PRODUCT_TABLE_NAME);
+                const stocksTableData: any = await this.getTableDataBy(this.STOCK_TABLE_NAME);
+                resolve(this.innerJoin(productsTableData.Items, stocksTableData.Items));
+            } catch (error) {
+                reject(error);
+            }
+        })
+    }
+
+    async getTableDataBy(tableName: string): Promise<any> {
+        return this.dynamoDbDocumentClient.scan({
+            TableName: tableName
+        }).promise();
     }
 
     async getProductBy(productId: string): Promise<Product> {
-        try {
-            const product = ProductsData.find((res) => res.id === productId)
-            this.checkIfProductExists(product);
-            return Promise.resolve(product);
-        } catch (error) {
-            throw error;
-        }
+        return new Promise(async (resolve, reject) => {
+            try {
+                const product = await this.getSingleItemBy(this.PRODUCT_TABLE_NAME, { 'id': productId });
+                this.checkIfProductExists(product);
+                const stock = await this.getSingleItemBy(this.STOCK_TABLE_NAME, { 'product_id': productId });
+                resolve({ ...product.Item, count: stock.Item.count })
+            } catch (error) {
+                reject(error)
+            }
+        })
+    }
+
+    async getSingleItemBy(tableName, key: any): Promise<any> {
+        return this.dynamoDbDocumentClient.get({
+            TableName: tableName,
+            Key: key
+        }).promise();
     }
 
     checkIfProductExists(product: any) {
-        if (!product) {
+        if (!product.hasOwnProperty('Item')) {
             throw new NoProductFound()
         }
+    }
+
+    innerJoin(productsData: Array<any>, stocksData: Array<any>): Array<Product> {
+        return productsData.map(product => {
+            return { ...product, count: stocksData.find(stock => stock.product_id === product.id).count }
+        });
     }
 }
