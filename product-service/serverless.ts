@@ -1,6 +1,6 @@
 import type { AWS } from '@serverless/typescript';
 
-import { getProductsList, getProductsById } from '@functions/index';
+import { getProductsList, getProductsById, createProduct } from '@functions/index';
 
 const serverlessConfiguration: AWS = {
   service: 'product-service',
@@ -24,7 +24,8 @@ const serverlessConfiguration: AWS = {
         Effect: "Allow",
         Action: [
           "dynamodb:Scan",
-          "dynamodb:GetItem"
+          "dynamodb:GetItem",
+          "dynamodb:PutItem"
         ],
         Resource: [
           "arn:aws:dynamodb:ap-south-1:059012808184:table/products",
@@ -33,7 +34,7 @@ const serverlessConfiguration: AWS = {
     ]
   },
   // import the function via paths
-  functions: { getProductsList, getProductsById },
+  functions: { getProductsList, getProductsById, createProduct },
   package: { individually: true },
   custom: {
     autoswagger: {

@@ -11,10 +11,12 @@ export const getProductsById = async (event) => {
     return formatJSONResponse(await productService.getProductBy(productId), statusCode);
   } catch (error) {
     statusCode = 500;
+    let message = 'Something Went Wrong, Please try again later!'
     if (error.message === NO_PRDUCT_FOUND) {
-      statusCode = 404;
+      message = error.message,
+        statusCode = 404;
     }
-    return formatJSONResponse({ message: error.message || 'error' }, statusCode);
+    return formatJSONResponse({ message }, statusCode);
   }
 };
 

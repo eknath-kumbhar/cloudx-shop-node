@@ -1,6 +1,7 @@
 import { NoProductFound } from "./errors";
 import { Product } from "./types/product";
 import AWS from 'aws-sdk';
+import { randomUUID } from "crypto";
 
 export class ProductService {
     DB_REGION: string;
@@ -61,6 +62,39 @@ export class ProductService {
     innerJoin(productsData: Array<any>, stocksData: Array<any>): Array<Product> {
         return productsData.map(product => {
             return { ...product, count: stocksData.find(stock => stock.product_id === product.id).count }
+        });
+    }
+
+    async insertProduct(product: any): Promise<any> {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const productId = randomUUID();
+                const { count, ...productData } = product;
+
+                await this.dynamoDbDocumentClient.transactWrite({
+                    TransactItems: [{
+                        Put: {
+                            TableName: this.PRODUCT_TABLE_NAME,
+                            Item: {
+                                id: productId,
+                                ...productData
+                            },
+                        }
+                    }, {
+                        Put: {
+                            TableName: this.STOCK_TABLE_NAME,
+                            Item: {
+                                product_id: productId,
+                                count
+                            },
+                        }
+                    }]
+                }).promise();
+
+                resolve({ ...product, id: productId })
+            } catch (error) {
+                reject(error)
+            }
         });
     }
 }
