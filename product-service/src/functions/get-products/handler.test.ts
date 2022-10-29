@@ -1,5 +1,5 @@
-import { ProductsData } from "../../products.mock";
 import { getProductsList } from './handler';
+import ProductsData from "src/assets/products.json";
 
 describe('getProductList', () => {
     it('should return correct successful response', async () => {
