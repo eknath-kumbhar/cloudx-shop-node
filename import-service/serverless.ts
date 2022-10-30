@@ -1,14 +1,16 @@
 import type { AWS } from '@serverless/typescript';
 
-import hello from '@functions/hello';
+import { importProductsFile } from '@functions/index';
 
 const serverlessConfiguration: AWS = {
   service: 'import-service',
   frameworkVersion: '3',
-  plugins: ['serverless-esbuild'],
+  plugins: ['serverless-dotenv-plugin', 'serverless-auto-swagger', 'serverless-esbuild', 'serverless-offline'],
+  useDotenv: true,
   provider: {
     name: 'aws',
     runtime: 'nodejs14.x',
+    region: 'ap-south-1',
     apiGateway: {
       minimumCompressionSize: 1024,
       shouldStartNameWithService: true,
@@ -17,9 +19,16 @@ const serverlessConfiguration: AWS = {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
     },
+    iamRoleStatements: [
+      {
+        Effect: "Allow",
+        Action: ["s3:PutObject"],
+        Resource: ["arn:aws:s3:::task-5-files/*"]
+      }
+    ]
   },
   // import the function via paths
-  functions: { hello },
+  functions: { importProductsFile },
   package: { individually: true },
   custom: {
     esbuild: {

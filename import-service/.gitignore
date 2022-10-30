@@ -7,3 +7,9 @@ jspm_packages
 
 # esbuild directories
 .esbuild
+
+# swagger directories
+swagger
+
+# environmment files
+.env
