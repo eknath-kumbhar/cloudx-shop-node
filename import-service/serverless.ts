@@ -1,6 +1,6 @@
 import type { AWS } from '@serverless/typescript';
 
-import { importProductsFile } from '@functions/index';
+import * as functions from '@functions/index';
 
 const serverlessConfiguration: AWS = {
   service: 'import-service',
@@ -22,13 +22,13 @@ const serverlessConfiguration: AWS = {
     iamRoleStatements: [
       {
         Effect: "Allow",
-        Action: ["s3:PutObject"],
+        Action: ["s3:*"],
         Resource: ["arn:aws:s3:::task-5-files/*"]
       }
     ]
   },
   // import the function via paths
-  functions: { importProductsFile },
+  functions,
   package: { individually: true },
   custom: {
     esbuild: {

@@ -1,13 +1,12 @@
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-
-const REGION = "ap-south-1";
+import csvParser from "csv-parser";
 
 export class ImportService {
     constructor() { }
 
     getS3Client(): S3Client {
-        return new S3Client({ region: REGION });
+        return new S3Client({ region: process.env.REGION });
     }
 
     async uploadToS3(name: string) {
@@ -26,5 +25,17 @@ export class ImportService {
                 reject(error)
             }
         })
+    }
+
+    async streamToString(stream) {
+        return new Promise((resolve, reject) => {
+            console.log("streaming file");
+            const chunks = [];
+            stream
+                .pipe(csvParser())
+                .on("data", (chunk) => chunks.push(chunk))
+                .on("error", reject)
+                .on("end", () => resolve(JSON.stringify(chunks, null, 2)));
+        });
     }
 }
