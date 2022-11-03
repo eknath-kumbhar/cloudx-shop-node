@@ -1,6 +1,6 @@
 import type { AWS } from '@serverless/typescript';
 
-import { getProductsList, getProductsById, createProduct } from '@functions/index';
+import * as functions from '@functions/index';
 
 const serverlessConfiguration: AWS = {
   service: 'product-service',
@@ -34,7 +34,7 @@ const serverlessConfiguration: AWS = {
     ]
   },
   // import the function via paths
-  functions: { getProductsList, getProductsById, createProduct },
+  functions,
   package: { individually: true },
   custom: {
     autoswagger: {
@@ -51,6 +51,16 @@ const serverlessConfiguration: AWS = {
       concurrency: 10,
     }
   },
+  resources: {
+    Resources: {
+      catalogItemsQueue: {
+        Type: "AWS::SQS::Queue",
+        Properties: {
+          QueueName: "catalogItemsQueue"
+        }
+      }
+    }
+  }
 };
 
 module.exports = serverlessConfiguration;
