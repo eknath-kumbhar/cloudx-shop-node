@@ -2,6 +2,8 @@ import { NoProductFound } from "./errors";
 import { Product } from "./types/product";
 import AWS from 'aws-sdk';
 import { randomUUID } from "crypto";
+import { SNSClient, PublishCommand } from "@aws-sdk/client-sns";
+
 
 export class ProductService {
     DB_REGION: string;
@@ -96,5 +98,26 @@ export class ProductService {
                 reject(error)
             }
         });
+    }
+
+    getSnsClient(): SNSClient {
+        return new SNSClient({ region: process.env.REGION });
+    }
+
+    async publishToTopic(message: any) {
+        var params = {
+            Message: message,
+            TopicArn: process.env.TOPIC_ARN,
+        };
+
+        return new Promise(async (resolve, reject) => {
+            try {
+                const snsClient = this.getSnsClient();
+                const data = await snsClient.send(new PublishCommand(params));
+                resolve(data)
+            } catch (error) {
+                reject(error);
+            }
+        })
     }
 }

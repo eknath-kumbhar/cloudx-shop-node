@@ -8,6 +8,7 @@ export const catalogBatchProcess = async (event) => {
     const { Records: records } = event;
     const products = records.reduce((previousValue: Array<any>, currentValue: any) => [...previousValue, ...(JSON.parse(currentValue.body))], [])
     await Promise.all(products.map((product: Array<any>) => productService.insertProduct(product)))
+    await productService.publishToTopic('New Product/s created')
     return formatJSONResponse({ message: 'products created' }, 200);
   } catch (error) {
     return formatJSONResponse({ message: 'Something Went Wrong, Please try again later!' }, 500);

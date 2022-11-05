@@ -30,6 +30,11 @@ const serverlessConfiguration: AWS = {
         Resource: [
           "arn:aws:dynamodb:ap-south-1:059012808184:table/products",
           "arn:aws:dynamodb:ap-south-1:059012808184:table/stocks"]
+      },
+      {
+        Effect: "Allow",
+        Action: ["sns:Publish"],
+        Resource: ["arn:aws:sns:ap-south-1:059012808184:createProductTopic"]
       }
     ]
   },
@@ -57,6 +62,18 @@ const serverlessConfiguration: AWS = {
         Type: "AWS::SQS::Queue",
         Properties: {
           QueueName: "catalogItemsQueue"
+        }
+      },
+      createProductTopic: {
+        Type: "AWS::SNS::Topic",
+        Properties: {
+          TopicName: "createProductTopic",
+          Subscription: [
+            {
+              Endpoint: 'eknathkumbharv1@hotmail.com',
+              Protocol: 'email'
+            }
+          ]
         }
       }
     }
