@@ -75,6 +75,17 @@ const serverlessConfiguration: AWS = {
             }
           ]
         }
+      },
+      createProductTopicSubscription: {
+        Type: "AWS::SNS::Subscription",
+        Properties: {
+          Endpoint: 'eknathkumbharv1@gmail.com',
+          Protocol: 'email',
+          TopicArn: { Ref: "createProductTopic" },
+          FilterPolicy: {
+            price: [{ numeric: ['>', 10] }]
+          }
+        }
       }
     }
   }
