@@ -4,25 +4,20 @@ import { ImportService } from 'src/import.service';
 
 const importFileParser = async (event) => {
   try {
-    console.log("runned, ", event);
     const { awsRegion, s3: { bucket, object: s3Object } } = event.Records[0];
-    console.log(s3Object);
-    
+
     const s3Client = new S3Client({ region: awsRegion });
     const importService = new ImportService()
-    
+
     const bucketParams = {
       Bucket: bucket.name,
       Key: s3Object.key,
     };
+    
     const command = new GetObjectCommand(bucketParams);
     const streamData = await s3Client.send(command);
-
-    console.log("STREAM DATA =>, ", streamData);
     const data = await importService.streamToString(streamData.Body);
-    console.log("PARSED DATA: ", data);
 
-    console.log("coping file");
     await s3Client.send(
       new CopyObjectCommand({
         ...bucketParams,
@@ -30,12 +25,10 @@ const importFileParser = async (event) => {
         Key: bucketParams.Key.replace("uploaded", "parsed"),
       })
     );
-
-    console.log("deleting file");
     await s3Client.send(new DeleteObjectCommand(bucketParams));
-    console.log("everything ok");
-    
-    return formatJSONResponse("CSV parsed.", 200);
+    await importService.sendMessageToQueue(data);
+
+    return formatJSONResponse("CSV parsed and send to queue", 200);
   } catch (error) {
     console.log("Error while parsing CSV ===> ", error);
     throw error;

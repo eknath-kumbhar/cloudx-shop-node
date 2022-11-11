@@ -1,6 +1,6 @@
 import type { AWS } from '@serverless/typescript';
 
-import { getProductsList, getProductsById, createProduct } from '@functions/index';
+import * as functions from '@functions/index';
 
 const serverlessConfiguration: AWS = {
   service: 'product-service',
@@ -30,11 +30,16 @@ const serverlessConfiguration: AWS = {
         Resource: [
           "arn:aws:dynamodb:ap-south-1:059012808184:table/products",
           "arn:aws:dynamodb:ap-south-1:059012808184:table/stocks"]
+      },
+      {
+        Effect: "Allow",
+        Action: ["sns:Publish"],
+        Resource: ["arn:aws:sns:ap-south-1:059012808184:createProductTopic"]
       }
     ]
   },
   // import the function via paths
-  functions: { getProductsList, getProductsById, createProduct },
+  functions,
   package: { individually: true },
   custom: {
     autoswagger: {
@@ -51,6 +56,39 @@ const serverlessConfiguration: AWS = {
       concurrency: 10,
     }
   },
+  resources: {
+    Resources: {
+      catalogItemsQueue: {
+        Type: "AWS::SQS::Queue",
+        Properties: {
+          QueueName: "catalogItemsQueue"
+        }
+      },
+      createProductTopic: {
+        Type: "AWS::SNS::Topic",
+        Properties: {
+          TopicName: "createProductTopic",
+          Subscription: [
+            {
+              Endpoint: 'eknathkumbharv1@hotmail.com',
+              Protocol: 'email'
+            }
+          ]
+        }
+      },
+      createProductTopicSubscription: {
+        Type: "AWS::SNS::Subscription",
+        Properties: {
+          Endpoint: 'eknathkumbharv1@gmail.com',
+          Protocol: 'email',
+          TopicArn: { Ref: "createProductTopic" },
+          FilterPolicy: {
+            price: [{ numeric: ['>', 10] }]
+          }
+        }
+      }
+    }
+  }
 };
 
 module.exports = serverlessConfiguration;

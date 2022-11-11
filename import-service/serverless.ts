@@ -24,6 +24,11 @@ const serverlessConfiguration: AWS = {
         Effect: "Allow",
         Action: ["s3:*"],
         Resource: ["arn:aws:s3:::task-5-files/*"]
+      },
+      {
+        Effect: "Allow",
+        Action: ["sqs:SendMessage"],
+        Resource: ["arn:aws:sqs:ap-south-1:059012808184:catalogItemsQueue"]
       }
     ]
   },

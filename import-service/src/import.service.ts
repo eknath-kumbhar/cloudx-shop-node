@@ -1,6 +1,7 @@
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import csvParser from "csv-parser";
+import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
 
 export class ImportService {
     constructor() { }
@@ -37,5 +38,26 @@ export class ImportService {
                 .on("error", reject)
                 .on("end", () => resolve(JSON.stringify(chunks, null, 2)));
         });
+    }
+
+    getSqsClient(): SQSClient {
+        return new SQSClient({ region: process.env.REGION });
+    }
+
+    async sendMessageToQueue(message: any) {
+        const params = {
+            MessageBody: message,
+            QueueUrl: process.env.SQS_QUEUE_URL
+        }
+
+        return new Promise(async (resolve, reject) => {
+            try {
+                const sqsClient = this.getSqsClient();
+                const data = await sqsClient.send(new SendMessageCommand(params));
+                resolve(data)
+            } catch (error) {
+                reject(error);
+            }
+        })
     }
 }
