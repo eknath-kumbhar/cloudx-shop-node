@@ -17,6 +17,12 @@ export default {
             description: 'This is a error response',
             bodyType: 'string'
           }
+        },
+        authorizer: {
+          arn: 'arn:aws:lambda:ap-south-1:059012808184:function:authorization-service-dev-basicAuthorizer',
+          name: 'basicAuthorizer',
+          type: 'TOKEN',
+          identitySource: 'method.request.header.Authorization',
         }
       },
     },

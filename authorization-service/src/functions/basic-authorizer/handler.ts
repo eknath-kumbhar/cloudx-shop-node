@@ -14,13 +14,10 @@ const basicAuthorizer = async (event: APIGatewayTokenAuthorizerEvent, context, c
     }
     const token = event.authorizationToken.split(' ').pop()
     const effect = authenticateUserBy(token)
-    if (effect !== EFFECT.Deny) {
-      throw new Error('403');
-    }
     policy = generatePolicy(event, effect);
     callback(null, policy)
   } catch (error) {
-    callback(error.message === '403' ? 'Access Denied' : 'Unauthorized')
+    callback(error.message)
   }
 };
 
