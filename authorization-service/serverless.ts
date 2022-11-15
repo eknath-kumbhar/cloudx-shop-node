@@ -3,10 +3,9 @@ import type { AWS } from '@serverless/typescript';
 import * as functions from '@functions/index';
 
 const serverlessConfiguration: AWS = {
-  service: 'import-service',
+  service: 'authorization-service',
   frameworkVersion: '3',
-  plugins: ['serverless-dotenv-plugin', 'serverless-auto-swagger', 'serverless-esbuild', 'serverless-offline'],
-  useDotenv: true,
+  plugins: ['serverless-dotenv-plugin', 'serverless-esbuild'],
   provider: {
     name: 'aws',
     runtime: 'nodejs14.x',
@@ -22,33 +21,22 @@ const serverlessConfiguration: AWS = {
     iamRoleStatements: [
       {
         Effect: "Allow",
-        Action: ["s3:*"],
-        Resource: ["arn:aws:s3:::task-5-files/*"]
-      },
-      {
-        Effect: "Allow",
-        Action: ["sqs:SendMessage"],
-        Resource: ["arn:aws:sqs:ap-south-1:059012808184:catalogItemsQueue"]
+        Action: ["execute-api:Invoke"],
+        Resource: ["*"]
       }
     ]
   },
+  // import the function via paths
+  functions,
   resources: {
-    Resources: {
-      GatewayResponseDefault4XX: {
-        Type: 'AWS::ApiGateway::GatewayResponse',
-        Properties: {
-          ResponseParameters: {
-            "gatewayresponse.header.Access-Control-Allow-Origin": "'*'",
-            "gatewayresponse.header.Access-Control-Allow-Headers": "'*'",
-          },
-          ResponseType: "DEFAULT_4XX",
-          RestApiId: { Ref: 'ApiGatewayRestApi' }
+    Outputs: {
+      BasicAuthorizerArn: {
+        Value: {
+          "Fn::GetAtt": ["BasicAuthorizerLambdaFunction", "Arn"],
         }
       }
     }
   },
-  // import the function via paths
-  functions,
   package: { individually: true },
   custom: {
     esbuild: {
